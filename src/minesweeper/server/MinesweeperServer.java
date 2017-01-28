@@ -55,6 +55,16 @@ public class MinesweeperServer {
      * Start a MinesweeperServer running on the default port.
      */
     public static void main(String[] args) {
+/*TODO: Process args here (Problem 4)
+ * 
+ *		ARGS := DEBUG " " (SIZE | FILE)?
+ *      DEBUG:= "true" | "false"
+ *      SIZE := "-s " [0-9]+
+ *      FILE := "-f " .+
+ *      
+ *      Example for an executable named "server": server true -s 25
+ *      If neither SIZE nor FILE is provided, treat it as if the args were SIZE 10.
+ */  	
     	MinesweeperServer server = null;
         try {
             server = new MinesweeperServer(PORT);

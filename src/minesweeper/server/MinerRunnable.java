@@ -2,8 +2,9 @@ package minesweeper.server;
 import java.net.*;
 import java.io.*;
 
-/* Use: MinesweeperServer starts a new Thread for each connected user, which calls run().
- * Code modeled from an example on Jenkov.com:
+/**
+ * <h1>Use: MinesweeperServer starts a new Thread for each connected user, which calls run().</h1>
+ * Code modeled from an example on Jenkov.com:</br>
  * http://tutorials.jenkov.com/java-multithreaded-servers/multithreaded-server.html
  */
 public class MinerRunnable implements Runnable {
@@ -18,8 +19,9 @@ public class MinerRunnable implements Runnable {
         try {
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-            
-            out.println("Welcome to Minesweeper. ?? people are playing including you.");
+
+//TODO: Fix the next line's variable; it displays "2" when only I am connected.
+            out.println("Welcome to Minesweeper. " + Thread.activeCount() + " people are playing including you.");
             out.println("Type 'help' for help.");
 
         	for (String line = in.readLine(); line != null; line = in.readLine()) {
@@ -37,7 +39,7 @@ public class MinerRunnable implements Runnable {
     }
 
 	/**
-	 * handler for client input
+	 * Handler for client input
 	 * 
 	 * make requested mutations on game state if applicable, then return appropriate message to the user
 	 * 
