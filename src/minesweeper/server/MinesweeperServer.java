@@ -2,6 +2,8 @@ package minesweeper.server;
 
 import java.net.*;
 import java.io.*;
+import minesweeper.Board;
+
 
 public class MinesweeperServer {
 
@@ -65,6 +67,7 @@ public class MinesweeperServer {
  *      Example for an executable named "server": server true -s 25
  *      If neither SIZE nor FILE is provided, treat it as if the args were SIZE 10.
  */  	
+    	
     	MinesweeperServer server = null;
         try {
             server = new MinesweeperServer(PORT);
