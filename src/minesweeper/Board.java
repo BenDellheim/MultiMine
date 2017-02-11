@@ -13,9 +13,9 @@ public class Board{
 	private Square[][] Minefield;
 	private final int size;
 	
-	// Constructors
-	// Creates a default board
-	Board(){
+	// There are 3 Constructors: Board(), Board(int boardSize), and Board(String filePath).
+	public Board(){
+		// Creates a default board
 		size = 10;
 		Minefield = new Square[size][size];
 		
@@ -44,8 +44,8 @@ public class Board{
 		
 	}
 
-	// Creates a board given a board size
-	Board( int boardSize){
+	public Board( int boardSize){
+		// Creates a board given a board size
 		if( boardSize < 10 || boardSize > 80) size = 10;
 		else size = boardSize;
 		
@@ -75,8 +75,8 @@ public class Board{
 		}
 	}
 
-	// Creates a board by reading it from a file
-	Board( String filePath) throws IOException, ParseException {
+	public Board( String filePath) throws IOException, ParseException {
+		// Creates a board by reading it from a file
 		int tempSize = 0;
 		try( FileReader fr = new FileReader(filePath);
 			 BufferedReader br = new BufferedReader(fr);)
