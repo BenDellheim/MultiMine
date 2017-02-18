@@ -15,12 +15,19 @@ public class MinesweeperServerTest {
 	public void test() {
 		processArgs("true".split(" "));
 		Minefield.showField();
+		String butts;
+		butts = Minefield.look();
+		System.out.println(butts);
 		
 		processArgs("true -s 18".split(" "));
 		Minefield.showField();
+		butts = Minefield.look();
+		System.out.println(butts);
 		
 		processArgs("true -f samples/TestBoard1.txt".split(" "));
 		Minefield.showField();
+		butts = Minefield.look();
+		System.out.println(butts);
 	}
 	
     private void processArgs(String[] args)

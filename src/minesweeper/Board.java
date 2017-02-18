@@ -156,6 +156,41 @@ public class Board{
 		}
 		
 	}
+
+	/**
+	 * @return the board as the client sees it.
+	 */
+	public synchronized String look(){
+		String output = "";
+		for( int i = 0; i < size; i++)
+		{
+			for( int j = 0; j < size; j++)
+			{
+				if(Minefield[i][j].getState() == State.DUG) 
+				{
+					if(neighbors(i,j) == 0) output += "  ";
+					else output += neighbors(i,j) + " ";
+				}
+				else if(Minefield[i][j].getState() == State.FLAGGED) output += "F ";
+				else output += "- ";
+			}
+			output += "\n";
+		}
+		
+		return output;
+	}
+
+	public synchronized Boolean dig(int x, int y){
+		return Minefield[x][y].dig();
+	}
+
+	public synchronized void flag(int x, int y){
+		Minefield[x][y].flag();
+	}
+	
+	public synchronized void unflag(int x, int y){
+		Minefield[x][y].unflag();
+	}
 	
 	/**
 	 * Counts the mines surrounding a given coordinate pair.

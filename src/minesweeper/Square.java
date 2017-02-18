@@ -18,6 +18,7 @@ public final class Square {
 	}
 	
 	/**
+	 * Digs here.
 	 * @return TRUE if a mine was dug, FALSE if not
 	 * @modifies hasMine to FALSE regardless
 	 */
@@ -32,6 +33,11 @@ public final class Square {
 		{
 			return Boolean.FALSE;
 		}
+	}
+
+	public State getState()
+	{
+		return s;
 	}
 	
 	public Boolean hasMine()
