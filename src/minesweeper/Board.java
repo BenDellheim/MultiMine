@@ -174,7 +174,7 @@ public class Board{
 				else if(Minefield[i][j].getState() == State.FLAGGED) output += "F ";
 				else output += "- ";
 			}
-			output += "\n";
+			output += "\r\n";
 		}
 		
 		return output;
@@ -205,13 +205,20 @@ public class Board{
 		{
 			for( int y = j-1; y <= j+1; y++)
 			{
-				if( x >= 0 && y >= 0 && x < size && y < size)
-				{
+				if( isValidIndex(x, y))
 					if( Minefield[x][y].hasMine() && !(x == i && y == j)) count++;
-				}
 			}
 		}
 		return count;
+	}
+
+	/**
+	 * Confirms the index provided is inside the board.
+	 */
+	public Boolean isValidIndex( int x, int y)
+	{
+		if( x >= 0 && y >= 0 && x < size && y < size) return true;
+		return false;
 	}
 
 	/**

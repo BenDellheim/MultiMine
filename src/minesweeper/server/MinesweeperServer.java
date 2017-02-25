@@ -123,9 +123,21 @@ public class MinesweeperServer {
     }
     
 	public String help(){
-		return "I'm a helper!";
+		return "Here's the command list.\r\n" +
+				"look: Displays the board.\r\n" +
+				"dig x y: Digs at (x, y) then displays the board.\r\n" +
+				"         The upper left corner is (0, 0).\r\n" +
+				"flag x y: Puts a flag at (x, y). Use flags to mark the mines!\r\n" +
+				"deflag x y: Removes a flag at (x, y).\r\n" +
+				"help: Displays this message.\r\n" +
+				"bye: Leaves the game.";
 	}
 	
+	/**
+	 * Exits the game.
+	 * @return null if Debug Mode is off; this tells the client the user went boom.</br>
+	 * Otherwise if Debug Mode is on, returns a mercy message.
+	 */
 	public String bye(){
 		if( inDebugMode) return "YOU WERE LUCKY.";
 		else return null; // Kick user if were aren't debugging

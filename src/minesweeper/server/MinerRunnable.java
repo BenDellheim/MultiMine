@@ -9,7 +9,7 @@ import java.io.*;
  */
 public class MinerRunnable implements Runnable {
 	protected Socket socket = null;
-	private volatile int players = 0;
+	private static int players = 0;
 	private Boolean killedByMine = false;
 	private MinesweeperServer server; // A reference to the server, to use its get/set members
 
@@ -24,14 +24,16 @@ public class MinerRunnable implements Runnable {
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 
-            out.println("Welcome to Minesweeper. " + players + " players are playing including you.");
+            out.println("Welcome to Minesweeper. " + players + " player(s) are playing including you.");
             out.println("Type 'help' for help.");
 
+            // Main input loop
         	for (String line = in.readLine(); line != null; line = in.readLine()) {
         		String output = handleRequest(line);
         		if(output != null) {
         			out.println(output);
         		}
+        		else break;
         	}
 
         	// Output null -> player disconnected
@@ -61,7 +63,7 @@ public class MinerRunnable implements Runnable {
 		String regex = "(look)|(dig \\d+ \\d+)|(flag \\d+ \\d+)|(deflag \\d+ \\d+)|(help)|(bye)";
 		if(!input.matches(regex)) {
 			//invalid input
-			return null;
+			return "Huh? [" + input + "] not recognized.";
 		}
 		String[] tokens = input.split(" ");
 		if(tokens[0].equals("look")) {
@@ -84,7 +86,19 @@ public class MinerRunnable implements Runnable {
 					// Death! (You hit a mine)
 					return boom();
 				}
-				else return server.board();
+				else if( server.Minefield.neighbors(x, y) == 0)
+				{
+					// The runaway effect; if no mines, clear the surrounding tiles automatically.
+					for( int i = x-1; i <= x+1; i++)
+					{
+						for( int j = y-1; j <= y+1; j++)
+						{
+							if( server.Minefield.isValidIndex(i, j)) server.Minefield.dig(i, j);
+						}
+					}
+				}
+				// Display the board after digging
+				return server.board();
 			} else if(tokens[0].equals("flag")) {
 				// 'flag x y' request
 				server.Minefield.flag(x, y);
