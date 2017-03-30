@@ -1,5 +1,6 @@
 package minesweeper.server;
 
+import minesweeper.Board;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
@@ -13,7 +14,7 @@ public class MinesweeperServerTest {
 
 	@Test
 	public void test() {
-		processArgs("true".split(" "));
+/*		processArgs("true".split(" "));
 		Minefield.showField();
 		String butts;
 		butts = Minefield.look();
@@ -23,11 +24,12 @@ public class MinesweeperServerTest {
 		Minefield.showField();
 		butts = Minefield.look();
 		System.out.println(butts);
-		
+	*/	
 		processArgs("true -f samples/TestBoard1.txt".split(" "));
 		Minefield.showField();
-		butts = Minefield.look();
-		System.out.println(butts);
+		Minefield.showMines();
+//		String butts = Minefield.look();
+//		System.out.println(butts);
 	}
 	
     private void processArgs(String[] args)
@@ -40,7 +42,7 @@ public class MinesweeperServerTest {
     	 *      FILE := "-f " .+
     	 *      
     	 *      Example for an executable named "server": server true -s 25
-    	 *      If neither SIZE nor FILE is provided, treat it as if the args were SIZE 10.
+    	 *      If neither SIZE nor FILE is provided, use the default Board constructor.
     	 */  	
 
     	try {

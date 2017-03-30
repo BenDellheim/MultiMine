@@ -80,7 +80,7 @@ public class MinesweeperServer {
     	 *      FILE := "-f " .+
     	 *      
     	 *      Example for an executable named "server": server true -s 25
-    	 *      If neither SIZE nor FILE is provided, treat it as if the args were SIZE 10.
+    	 *      If neither SIZE nor FILE is provided, the default Board constructor is used.
     	 */  	
 
     	try {
@@ -117,26 +117,36 @@ public class MinesweeperServer {
     		e.printStackTrace();
     	}
     }
-
+    
+    /**
+     * @return the current board for displaying.
+     */
     public String board(){
     	return Minefield.look();
     }
     
+    /**
+     * @return a list of commands the client can use.
+     */
 	public String help(){
-		return "Here's the command list.\r\n" +
-				"look: Displays the board.\r\n" +
-				"dig x y: Digs at (x, y) then displays the board.\r\n" +
-				"         The upper left corner is (0, 0).\r\n" +
-				"flag x y: Puts a flag at (x, y). Use flags to mark the mines!\r\n" +
-				"deflag x y: Removes a flag at (x, y).\r\n" +
-				"help: Displays this message.\r\n" +
-				"bye: Leaves the game.";
+		return "The goal of Minesweeper is to clear the field without touching any mines.\r\n" +
+			   "Digging will tell you the number of mines in the surrounding squares.\r\n" +
+			   "For instance, if a square says 1 and there is only one square untouched by it,\r\n" +
+			   "you should flag that untouched square and not dig there.\r\n\r\n" +
+			   "Command list\r\n" +
+			   "============\r\n" +
+				"look         Displays the board.\r\n" +
+				"dig x y      Digs at (x, y). The upper left corner is (0, 0).\r\n" +
+				"flag x y     Puts a flag at (x, y). Use flags to mark the mines!\r\n" +
+				"deflag x y   Removes a flag at (x, y).\r\n" +
+				"help         Displays this message.\r\n" +
+				"bye          Leaves the game.\r\n";
 	}
 	
 	/**
 	 * Exits the game.
-	 * @return null if Debug Mode is off; this tells the client the user went boom.</br>
-	 * Otherwise if Debug Mode is on, returns a mercy message.
+	 * @return null iff Debug Mode is off; this lets the client leave the main loop.</br>
+	 * Otherwise if Debug Mode is on, lets the client continue the game.
 	 */
 	public String bye(){
 		if( inDebugMode) return "YOU WERE LUCKY.";

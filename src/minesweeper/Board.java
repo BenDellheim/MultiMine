@@ -6,72 +6,76 @@ import java.io.*;
 /**
  * <h1>Board - an NxN grid of Squares</h1>
  * Shared MUTABLE datatype that is protected by synchronization.</br>
- * Only the Square subclass has modifiers, so only it gets synchronized functions.<p>
- * As true to Minesweeper, a Board can count the neighboring mines to any Square.
+ * As true to Minesweeper, a Board can count the neighboring mines to any Square.<p>
+ * 
+ * USAGE NOTE: Minefield[ ][ ] uses indexes [row][column] or (y, x),
+ * whereas all member functions use coordinates (x, y) to match user input.
  */
 public class Board{
 	private Square[][] Minefield;
 	private final int size;
+	private final int MIN_SIZE = 10;
+	private final int MAX_SIZE = 30;
 	
 	// There are 3 Constructors: Board(), Board(int boardSize), and Board(String filePath).
 	public Board(){
 		// Creates a default board
-		size = 10;
+		size = MIN_SIZE;
 		Minefield = new Square[size][size];
 		
 		// Initialize Minefield with default values (untouched, no mine)
-		for( int i=0; i < size; i++)
+		for( int row=0; row < size; row++)
 		{
-			for( int j=0; j < size; j++)
+			for( int col=0; col < size; col++)
 			{
-				Minefield[i][j] = new Square();
+				Minefield[row][col] = new Square();
 			}
 		}
 		
 		// Add an appropriate amount of mines (I chose 25% of the field)
 		int mines = (int)(size * size * .25);
 		Random rand = new Random();
-		for( int x=0; x < mines; x++)
+		for( int m=0; m < mines; m++)
 		{
-			int i, j;
+			int row, col;
 			do
 			{
-				i = rand.nextInt(size);
-				j = rand.nextInt(size);
-			}while(Minefield[i][j].hasMine());
-			Minefield[i][j].veryCarefullyBuryTheMine(); //Y'know, because they're MINES :V
+				row = rand.nextInt(size);
+				col = rand.nextInt(size);
+			}while(Minefield[row][col].hasMine());
+			Minefield[row][col].veryCarefullyBuryTheMine(); //Y'know, because they're MINES :V
 		}
 		
 	}
 
 	public Board( int boardSize){
 		// Creates a board given a board size
-		if( boardSize < 10 || boardSize > 80) size = 10;
+		if( boardSize < MIN_SIZE || boardSize > MAX_SIZE) size = MIN_SIZE;
 		else size = boardSize;
 		
 		Minefield = new Square[size][size];
 		
 		// Initialize Minefield with default values (untouched, no mine)
-		for( int i=0; i < size; i++)
+		for( int row=0; row < size; row++)
 		{
-			for( int j=0; j < size; j++)
+			for( int col=0; col < size; col++)
 			{
-				Minefield[i][j] = new Square();
+				Minefield[row][col] = new Square();
 			}
 		}
 		
 		// Add an appropriate amount of mines (I chose 25% of the field)
 		int mines = (int)(size * size * .25);
 		Random rand = new Random();
-		for( int x=0; x < mines; x++)
+		for( int m=0; m < mines; m++)
 		{
-			int i, j;
+			int row, col;
 			do
 			{
-				i = rand.nextInt(size);
-				j = rand.nextInt(size);
-			}while(Minefield[i][j].hasMine());
-			Minefield[i][j].veryCarefullyBuryTheMine(); //Y'know, because they're MINES :V
+				row = rand.nextInt(size);
+				col = rand.nextInt(size);
+			}while(Minefield[row][col].hasMine());
+			Minefield[row][col].veryCarefullyBuryTheMine(); //Y'know, because they're MINES :V
 		}
 	}
 
@@ -85,15 +89,15 @@ public class Board{
 			String line;
 			line = br.readLine().replaceAll(" ", "");
         	tempSize = line.length();
-        	if(tempSize < 10 || tempSize > 30) throw new ParseException("Board size " + tempSize + " not supported.");
+        	if(tempSize < MIN_SIZE || tempSize > MAX_SIZE) throw new ParseException("Board size " + tempSize + " not supported.");
 
     		Minefield = new Square[tempSize][tempSize];
     		// Initialize Minefield with default values (untouched, no mine)
-    		for( int i=0; i < tempSize; i++)
+    		for( int row=0; row < tempSize; row++)
     		{
-    			for( int j=0; j < tempSize; j++)
+    			for( int col=0; col < tempSize; col++)
     			{
-    				Minefield[i][j] = new Square();
+    				Minefield[row][col] = new Square();
     			}
     		}
     		
@@ -101,13 +105,16 @@ public class Board{
         	for( int col = 0; col < tempSize; col++)
         	{
         		if(line.charAt(col) == '1') Minefield[row][col].veryCarefullyBuryTheMine();
-        		else if(line.charAt(col) != '0') throw new ParseException("Incorrect board format!");
+        		else if(line.charAt(col) == '0') { /* No mine here */ }
+        		else throw new ParseException("Incorrect board format!");
         	}
-// TODO: This MIGHT cause an error if it calls replaceAll on a null line. Test this!        	
+
         	for( row = 1; row < tempSize; row++)
         	{
-    			line = br.readLine().replaceAll(" ", "");
-    			if(line == null || line.length() != tempSize) throw new ParseException("Incorrect board format!");
+    			line = br.readLine();
+    			if(line == null) throw new ParseException("Incorrect board format!");
+    			line = line.replaceAll(" ", "");
+    			if(line.length() != tempSize) throw new ParseException("Incorrect board format!");
     			
             	for( int col = 0; col < tempSize; col++)
             	{
@@ -116,6 +123,7 @@ public class Board{
             	}
 
         	}
+        	if( row != tempSize) throw new ParseException("Incorrect board format!");
 		}catch(ParseException p) {System.exit(-1);} 
 		catch(IOException e) {System.out.println("Error reading from file " + filePath); System.exit(-1);}
 		catch(Exception e) {System.exit(-1);}
@@ -128,11 +136,11 @@ public class Board{
 	 * For testing.
 	 */
 	public void showMines(){
-		for( int i = 0; i < size; i++)
+		for( int row = 0; row < size; row++)
 		{
-			for( int j = 0; j < size; j++)
+			for( int col = 0; col < size; col++)
 			{
-				if(Minefield[i][j].hasMine()) System.out.print("M ");
+				if(Minefield[row][col].hasMine()) System.out.print("M ");
 				else System.out.print("- ");
 			}
 			System.out.print("\n");
@@ -145,12 +153,14 @@ public class Board{
 	 * For testing.
 	 */
 	public void showField(){
-		for( int i = 0; i < size; i++)
+		for( int row = 0; row < size; row++)
 		{
-			for( int j = 0; j < size; j++)
+			for( int col = 0; col < size; col++)
 			{
-				if(Minefield[i][j].hasMine()) System.out.print("M ");
-				else System.out.print(neighbors(i, j) + " ");
+				int x = col;
+				int y = row;
+				if(Minefield[row][col].hasMine()) System.out.print("M ");
+				else System.out.print(neighbors(x, y) + " ");
 			}
 			System.out.print("\n");
 		}
@@ -158,20 +168,33 @@ public class Board{
 	}
 
 	/**
+	 * Checks if there is a mine at the specified position.
+	 */
+	public synchronized Boolean hasMine( int x, int y)
+	{
+		if( !isValidIndex(x,y)) return false; 
+		int row = y;
+		int col = x;
+		return Minefield[row][col].hasMine();
+	}
+
+	/**
 	 * @return the board as the client sees it.
 	 */
 	public synchronized String look(){
 		String output = "";
-		for( int i = 0; i < size; i++)
+		for( int row = 0; row < size; row++)
 		{
-			for( int j = 0; j < size; j++)
+			for( int col = 0; col < size; col++)
 			{
-				if(Minefield[i][j].getState() == State.DUG) 
+				int x = col;
+				int y = row;
+				if(Minefield[row][col].getState() == State.DUG) 
 				{
-					if(neighbors(i,j) == 0) output += "  ";
-					else output += neighbors(i,j) + " ";
+					if(neighbors(x,y) == 0) output += "  ";
+					else output += neighbors(x,y) + " ";
 				}
-				else if(Minefield[i][j].getState() == State.FLAGGED) output += "F ";
+				else if(Minefield[row][col].getState() == State.FLAGGED) output += "F ";
 				else output += "- ";
 			}
 			output += "\r\n";
@@ -180,35 +203,56 @@ public class Board{
 		return output;
 	}
 
+	/**
+	 * Digs at (x,y).
+	 * @return TRUE if a mine was dug, FALSE otherwise.
+	 */
 	public synchronized Boolean dig(int x, int y){
-		return Minefield[x][y].dig();
+		if( isValidIndex(x,y)) 
+		{
+			int row = y;
+			int col = x;
+			return Minefield[row][col].dig();
+		}
+		return false;
 	}
 
+	/**
+	 * Places a flag at (x,y).
+	 */
 	public synchronized void flag(int x, int y){
-		Minefield[x][y].flag();
+		if( isValidIndex(x,y)) 
+		{
+			int row = y;
+			int col = x;
+			Minefield[row][col].flag();
+		}
 	}
 	
+	/**
+	 * Removes a flag at (x,y).
+	 */
 	public synchronized void unflag(int x, int y){
-		Minefield[x][y].unflag();
+		if( isValidIndex(x,y))
+		{
+			int row = y;
+			int col = x;
+			Minefield[row][col].unflag();
+		}
 	}
 	
 	/**
 	 * Counts the mines surrounding a given coordinate pair.
-	 * @param i as in Minefield[ i ][ j ]
-	 * @param j as in Minefield[ i ][ j ]
 	 * @return the number of neighboring mines (0-8)
 	 */
-	public int neighbors( int i, int j)
+	public int neighbors( int x, int y)
 	{
 		int count = 0;
-		for( int x = i-1; x <= i+1; x++)
-		{
-			for( int y = j-1; y <= j+1; y++)
-			{
-				if( isValidIndex(x, y))
-					if( Minefield[x][y].hasMine() && !(x == i && y == j)) count++;
-			}
-		}
+		for( int row = y-1; row <= y+1; row++){
+		for( int col = x-1; col <= x+1; col++){
+			if( y == row && x == col) continue; // Don't count the center value
+			else if( isValidIndex(row, col) && Minefield[row][col].hasMine()) count++;
+		}}
 		return count;
 	}
 
@@ -221,6 +265,20 @@ public class Board{
 		return false;
 	}
 
+	/**
+	 * Confirms if the index provided has been dug up.
+	 */
+	public Boolean isDug( int x, int y)
+	{
+		int row = y;
+		int col = x;
+		if( isValidIndex(row, col))
+		{
+			return (Minefield[row][col].getState() == State.DUG);
+		}
+		return false;
+	}
+	
 	/**
 	 * Exception used for signaling grammatical errors in Minesweeper files
 	 */

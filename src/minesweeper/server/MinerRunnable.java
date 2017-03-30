@@ -5,7 +5,9 @@ import java.io.*;
 /**
  * <h1>Use: MinesweeperServer starts a new Thread for each connected user, which calls run().</h1>
  * Code modeled from an example on Jenkov.com:</br>
- * http://tutorials.jenkov.com/java-multithreaded-servers/multithreaded-server.html
+ * http://tutorials.jenkov.com/java-multithreaded-servers/multithreaded-server.html<p>
+ * 
+ * USAGE NOTE: All server.minefield member functions use coordinates (x, y) to match user input.
  */
 public class MinerRunnable implements Runnable {
 	protected Socket socket = null;
@@ -51,12 +53,12 @@ public class MinerRunnable implements Runnable {
     }
 
 	/**
-	 * Handler for client input
+	 * Handler for client input.<br />
+	 * Makes requested mutations on game state if applicable, then returns an appropriate message to the user.
 	 * 
-	 * make requested mutations on game state if applicable, then return appropriate message to the user
-	 * 
-	 * @param input
-	 * @return
+	 * @param input (the command typed by the client)
+	 * @return the String to be displayed to the client afterwards.<br />
+	 * bye() and boom() may return null, which will exit the main loop.
 	 */
 	private String handleRequest(String input) {
 
@@ -74,31 +76,20 @@ public class MinerRunnable implements Runnable {
 			return server.help();
 		} else if(tokens[0].equals("bye")) {
 			// 'bye' request
-			return server.bye();
+			return null;
 		} else {
 			int x = Integer.parseInt(tokens[1]);
 			int y = Integer.parseInt(tokens[2]);
+			if( !server.Minefield.isValidIndex(x,y)) return "Index out of range."; 
+
 			if(tokens[0].equals("dig")) {
 				// 'dig x y' request
-				Boolean result = server.Minefield.dig(x, y);
-				if( result == true)
-				{
-					// Death! (You hit a mine)
-					return boom();
-				}
-				else if( server.Minefield.neighbors(x, y) == 0)
-				{
-					// The runaway effect; if no mines, clear the surrounding tiles automatically.
-					for( int i = x-1; i <= x+1; i++)
-					{
-						for( int j = y-1; j <= y+1; j++)
-						{
-							if( server.Minefield.isValidIndex(i, j)) server.Minefield.dig(i, j);
-						}
-					}
-				}
-				// Display the board after digging
+				Boolean dugUpMine = digWithRunaway(x, y);
+				if( dugUpMine == true) return boom(); // Death!!
+
+				// Otherwise, display the board after digging
 				return server.board();
+
 			} else if(tokens[0].equals("flag")) {
 				// 'flag x y' request
 				server.Minefield.flag(x, y);
@@ -112,7 +103,37 @@ public class MinerRunnable implements Runnable {
 		//should never get here
 		return "";
 	}
-    
+
+	/**
+	 * Digs with a runaway effect. <br />
+	 * While no neighbors have mines, it will automatically clear the field. <br />
+	 * Since this can affect a lot of the board, I synchronized it.
+	 * @return TRUE if a mine was dug up, FALSE otherwise
+	 */
+	private synchronized Boolean digWithRunaway( int x, int y)
+	{
+		// Dig the first square and stop if we hit a mine.
+		if(server.Minefield.dig(x, y) == true) return true;
+		
+		if( server.Minefield.neighbors(x, y) == 0)
+		{
+			// If there are zero mines around (x,y), check the 8 surrounding squares.
+			for( int i = x-1; i <= x+1; i++){
+			for( int j = y-1; j <= y+1; j++){
+				if( x == i && y == j) continue;
+
+				// If the square is untouched, dig there and recurse if still zero.
+				if( server.Minefield.isValidIndex(i, j) && !server.Minefield.isDug(i, j))
+				{
+					server.Minefield.dig(i, j);
+					if( server.Minefield.neighbors(i, j) == 0) digWithRunaway( i, j);
+				}
+			}}
+		}
+		// No mines struck.
+		return false;
+	}
+	
 	private String boom()
 	{
 		String output = server.bye();
